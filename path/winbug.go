@@ -75,6 +75,10 @@ func CustomRename(o, n string) error {
 		cmd := exec.Command("cmd.exe", "/c", "move", o, n)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
+			cmd = exec.Command("xcopy.exe", o, n, "/E", "/I", "/Q", "/H", "/K", "/Y")
+			output, err = cmd.CombinedOutput()
+		}
+		if err != nil {
 			return fmt.Errorf("Error moving files: %s. output: %s", err, output)
 		}
 
