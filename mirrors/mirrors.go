@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/Masterminds/glide/msg"
 	gpath "github.com/Masterminds/glide/path"
@@ -26,11 +27,20 @@ type mirror struct {
 // - vcs type
 func Get(k string) (bool, string, string) {
 	o, f := mirrors[k]
-	if !f {
-		return false, "", ""
+	if f {
+		return true, o.Repo, o.Vcs
 	}
 
-	return true, o.Repo, o.Vcs
+	org := k
+	for li := strings.LastIndex(org, "/"); li != -1; li = strings.LastIndex(org, "/") {
+		org = org[:li]
+		o, f := mirrors[org]
+		if f {
+			return true, o.Repo, o.Vcs
+		}
+	}
+
+	return false, "", ""
 }
 
 // Load pulls the mirrors into memory
