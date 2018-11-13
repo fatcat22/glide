@@ -15,8 +15,13 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-// DefaultGlideFile is the default name for the glide.yaml file.
-const DefaultGlideFile = "glide.yaml"
+const (
+	// DefaultGlideFile is the default name for the glide.yaml file.
+	DefaultGlideFile = "glide.yaml"
+
+	// DefaultGlideFile is the default name for the local mirrors.yaml file.
+	DefaultLocalMirrorFile = "mirrors.yaml"
+)
 
 // VendorDir is the name of the directory that holds vendored dependencies.
 //
@@ -145,12 +150,23 @@ func Glide() (string, error) {
 	return gf, nil
 }
 
-// GlideWD finds the working directory of the glide.yaml file, starting at dir.
-//
-// If the glide file is not found in the current directory, it recurses up
-// a directory.
-func GlideWD(dir string) (string, error) {
-	fullpath := filepath.Join(dir, GlideFile)
+func LocalMirrors() (string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	// Find the directory that contains mirrors.yaml
+	yamldir, err := MirrorWD(cwd)
+	if err != nil {
+		return cwd, err
+	}
+
+	return filepath.Join(yamldir, DefaultLocalMirrorFile), nil
+}
+
+func ConfigWD(dir, cfgFile string) (string, error) {
+	fullpath := filepath.Join(dir, cfgFile)
 
 	if _, err := os.Stat(fullpath); err == nil {
 		return dir, nil
@@ -161,7 +177,19 @@ func GlideWD(dir string) (string, error) {
 		return "", fmt.Errorf("Cannot resolve parent of %s", base)
 	}
 
-	return GlideWD(base)
+	return ConfigWD(base, cfgFile)
+}
+
+// GlideWD finds the working directory of the glide.yaml file, starting at dir.
+//
+// If the glide file is not found in the current directory, it recurses up
+// a directory.
+func GlideWD(dir string) (string, error) {
+	return ConfigWD(dir, GlideFile)
+}
+
+func MirrorWD(dir string) (string, error) {
+	return ConfigWD(dir, DefaultLocalMirrorFile)
 }
 
 // Stores the gopaths so they do not get repeatedly looked up. This is especially

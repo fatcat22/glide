@@ -133,7 +133,10 @@ another location that's a mirror of the original. This is useful when you want
 to have a cache for your continuous integration (CI) system or if you want to
 work on a dependency in a local location.
 
-The mirrors are stored in an `mirrors.yaml` file in your `GLIDE_HOME`.
+The mirrors are stored in two place, one is an `mirrors.yaml` file in your `GLIDE_HOME`,
+another one is a `mirrors.yaml` file in your project directory,
+same as `glide.yaml` for example. The data in your local `mirrors.yaml` will
+cover data in you `GLIDE_HOME`.
 
 The three commands to manage mirrors are `list`, `set`, and `remove`.
 
@@ -152,6 +155,13 @@ for example,
 or
 
     glide mirror set https://github.com/example/foo file:///path/to/local/repo --vcs git
+
+Note that the url `original` support prefix match, that means if you set a mirror like this:
+
+    glide mirror set https://golang.org/x/crypto https://github.com/golang/crypto
+
+When glide is working and it find a dependent package https://golang.org/x/crypto/sha3,
+it will automatic cloning packge https://github.com/golang/crypto.
 
 Use `remove` in the form:
 
