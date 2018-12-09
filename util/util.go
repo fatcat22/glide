@@ -209,6 +209,10 @@ type vcsInfo struct {
 
 var vcsList = []*vcsInfo{
 	{
+		host:    "golang.org",
+		pattern: `^(?P<rootpkg>golang\.org/x/[A-Za-z0-9_.\-]+)(/[A-Za-z0-9_.\-]+)*$`,
+	},
+	{
 		host:    "github.com",
 		pattern: `^(?P<rootpkg>github\.com/[A-Za-z0-9_.\-]+/[A-Za-z0-9_.\-]+)(/[A-Za-z0-9_.\-]+)*$`,
 	},
